@@ -60,7 +60,7 @@ export const Chat = () => {
         return () => {
             socket.close ()
         }
-    }, [])
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
     
     console.log ("RERENDER")
 

@@ -20,5 +20,5 @@ jobs:
           with:
             node-version: 16.14.0
 
-        - run: set process.env.CI=false && cd client && yarn
+        - run: cd client && yarn
         - run: cd server && yarn && ./test.sh
