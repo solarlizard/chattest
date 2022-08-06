@@ -19,9 +19,9 @@
 # Out of scope
 
 - I redesigned code structure to have two separated projects, like they are in different repositories. I beleive it is not a good idea to do two jobs in one time (coding server and client, checking server using clinet). I prefer to build server and cover it with tests to be sure that I can build client without thinkig of server problems.
-- I removed schema validation, because I suppose that both client and server should use api models and validation generated from some OpenAPI or Protobuf schemas. Usually I am using my own code generators, and they generates not only models, but controller interfaces, clients and valiadators. 
+- I removed schema validation, because I suppose that both client and server should use api models and validation generated from some OpenAPI or Protobuf schemas. Usually I am using my own code generators, and they generates not only models, but controller interfaces, clients and valiadators.
 - Code in "generated" folders - are the code, that shuld be generated as I mentioned above
-
+- UI was manually checked only in latest chrome
 
 # CI
 
