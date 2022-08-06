@@ -56,7 +56,7 @@ export const Board = (props : BoardProps) => {
             return
         }
 
-        if (thisRef.current?.scrollTop !== 0) {
+        if (thisRef.current?.scrollTop !== 0 || e.deltaY >= 0) {
             return
         }
 
