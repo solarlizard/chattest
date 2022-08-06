@@ -45,6 +45,9 @@ export class MessageService {
             if (query.beforeIndex !== undefined) {
                 return list.reverse ()
             }
+            if (query.beforeIndex === undefined && query.afterIndex === undefined) {
+                return list.reverse ()
+            }
             else {
                 return list
             }

@@ -89,6 +89,12 @@ export class MessageDao {
             }
         }
 
+        if (query.afterIndex === undefined && query.beforeIndex === undefined) {
+            options.sort = {
+                index : -1
+            }
+        }
+
         const cursor = this.messagesCollection.find (filter, options)
 
         const result : MessageEntity [] = []

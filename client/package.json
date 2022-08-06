@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@faker-js/faker": "^7.3.0",
     "@testing-library/jest-dom": "5.16.4",
     "@testing-library/react": "13.3.0",
     "@testing-library/user-event": "14.4.1",
@@ -10,6 +11,7 @@
     "@types/node": "18.6.3",
     "@types/react": "18.0.15",
     "@types/react-dom": "18.0.6",
+    "@types/uuid": "8.3.4",
     "bootstrap": "5.2.0",
     "less": "4.1.3",
     "less-loader": "11.0.0",
@@ -20,6 +22,7 @@
     "rxjs": "7.5.5",
     "socket.io-client": "4.5.1",
     "typescript": "4.7.4",
+    "uuid": "8.3.2",
     "web-vitals": "2.1.4"
   },
   "resolutions": {
@@ -50,13 +53,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "dependencies": {
-    "@reduxjs/toolkit": "^1.8.3",
-    "@types/uuid": "^8.3.4",
-    "moment": "^2.29.4",
-    "react-redux": "^8.0.2",
-    "redux": "^4.2.0",
-    "uuid": "^8.3.2"
   }
 }

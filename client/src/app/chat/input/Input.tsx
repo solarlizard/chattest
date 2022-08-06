@@ -7,6 +7,7 @@ import { retryPromise } from "../../../util/retryPromise";
 import { trimToNull } from "../../../util/trimToNull";
 import { PostMessageApiModel, SERVER } from "../Server";
 import {v4} from "uuid"
+import { faker } from '@faker-js/faker';
 
 import styles from "./Input.module.css"
 
@@ -20,7 +21,7 @@ export const Input = (props : InputProps) => {
 
     const contentInput = useRef<HTMLInputElement> (null)
 
-    const [name, setName] = React.useState<string> ("")
+    const [name, setName] = React.useState<string> (`${faker.name.firstName ()} ${faker.name.lastName ()}`)
     const [nameIsInvalid, setNameIsInvalid] = React.useState (false)
 
     const [content, setContent] = React.useState<string> ("")
@@ -108,17 +109,9 @@ export const Input = (props : InputProps) => {
     const handleSeed = async () => {
         for (let q = 0; q < 100; q++) {
             await SERVER.postMessage ({
-                author : "Dart Veider",
+                author : faker.name.firstName () + " " + faker.name.lastName (),
                 id : v4 ().toString (),
-                content : Date.now () + " Small content "
-            })
-                .catch ()
-                .then ()
-
-            await SERVER.postMessage ({
-                author : "Obi-Wan Kenobi",
-                id : v4 ().toString (),
-                content : Date.now () + " The Jedi Master contends with the consequences of his greatest defeat -- the downfall and corruption of his one-time friend and apprentice, Anakin Skywalker, who turned to the dark side as evil Sith Lord Darth"
+                content : Date.now () + faker.hacker.phrase()
             })
                 .catch ()
                 .then ()

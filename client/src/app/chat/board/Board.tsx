@@ -24,13 +24,22 @@ export const Board = (props : BoardProps) => {
     const [pagedMessages, setPagedMessages] = useState<MessageModel []> ([])
 
     const handleMouseOver = () => mouseIsOver.current = true
-    const handleMouseLeave = () => mouseIsOver.current = false
+    const handleMouseLeave = () => {
+        mouseIsOver.current = false
+        bottomRef.current?.scrollIntoView({});
+    }
+
+    const firstMessagesReceived = useRef (false)
 
     React.useEffect(() => {
         
-        if (!mouseIsOver.current) {
+        if (!mouseIsOver.current || firstMessagesReceived.current === false) {
             bottomRef.current?.scrollIntoView({});
         }   
+
+        if (props.messages.length > 0) {
+            firstMessagesReceived.current = true
+        }
 
     }, [props.messages]);
 
@@ -48,68 +57,56 @@ export const Board = (props : BoardProps) => {
     }
 
     const handleWheelIsBusy = useRef (false)
-    const lastScrollTime = useRef (0)
 
     const handleWheel = (e : React.WheelEvent<HTMLDivElement>) => {
-        
+
         if (handleWheelIsBusy.current) {
             return
         }
         
-        if (e.deltaY < -30) {
+        if (boardRerf.current?.scrollTop === 0) {
 
-            const now = Date.now ()
+            const calculateAfterIndex = () => {
+                if (pagedMessages.length > 0) {
+                    return pagedMessages[0].index
+                }
+                else if (props.messages.length > 0) {
+                    return props.messages[0].index
+                }
+                else {
+                    return null
+                }
+            }
 
-            if (now - lastScrollTime.current < 1000) {
+            const afterIndex = calculateAfterIndex ()
+
+            if (afterIndex === null) {
                 return
             }
             
-            lastScrollTime.current = now
-    
-            if (boardRerf.current?.scrollTop === 0) {
-                
-                const calculateBeforeIndex = () => {
-                    if (pagedMessages.length > 0) {
-                        return pagedMessages[0].index
-                    }
-                    else if (props.messages.length > 0) {
-                        return props.messages[0].index
+            handleWheelIsBusy.current = true
+
+            retryPromise (logger, () => SERVER.listMessagesBefore (afterIndex))
+                .then (response => {
+                    if (response.type === 'success') {
+                        setPagedMessages (list => [...response.messages,...list])
+                        boardRerf.current!.scrollTop = 1
+
                     }
                     else {
-                        return null
+                        logger.error ("Invalid pading response", {response})
                     }
-                }
-
-                const beforeIndex = calculateBeforeIndex ()
-
-                if (beforeIndex === null) {
-                    return
-                }
-                
-                handleWheelIsBusy.current = true
-
-                retryPromise (logger, () => SERVER.listMessagesBefore (beforeIndex))
-                    .then (response => {
-                        if (response.type === 'success') {
-                            setPagedMessages (list => [...response.messages,...list])
-                        }
-                        else {
-                            logger.error ("Invalid pading response", {response})
-                        }
-                    })
-                    .finally (() => {
-                        handleWheelIsBusy.current = false
-                    })
-        
-        
-            }
+                })
+                .finally (() => {
+                    handleWheelIsBusy.current = false
+                })
         }
     }
     
     return (
         <div ref={boardRerf} className={styles.Board} onMouseEnter={handleMouseOver} onMouseLeave={handleMouseLeave} onScroll={handleScroll} onWheelCapture={handleWheel}>
-            {pagedMessages.map (item => <Message key={item.id} message={item}/>)}   
-            {props.messages.map (item => <Message key={item.id} message={item}/>)}   
+            {pagedMessages.map (item => <Message key={item.id} message={item}/>)}
+            {props.messages.map (item => <Message key={item.id} message={item}/>)}
             <div ref={bottomRef} />
         </div>
       )

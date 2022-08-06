@@ -62,8 +62,6 @@ export const Chat = () => {
         }
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
     
-    console.log ("RERENDER")
-
     return (
         <div className={styles.Chat} style={{overflow: "hidden"}}>
             <Board messages={messages}/>

@@ -5,18 +5,6 @@
 	cursor: pointer;
 }
 
-.Message:hover {
-	background-color: #eeeeee;
-}
-
-.Deleting {
-	background-color: #ffeeee;
-}
-
-.Deleting :hover {
-	background-color: #ffeeee;
-}
-
 .Header {
     display: flex ;
 }
