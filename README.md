@@ -1,4 +1,4 @@
-# Prerequirement
+# Prerequirements
 - docker
 - docker-compose
 
