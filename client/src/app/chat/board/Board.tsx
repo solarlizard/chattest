@@ -16,6 +16,7 @@ const logger = new Logger ("Board")
 
 export const Board = (props : BoardProps) => {
 
+    const allPagesReceived = useRef (false)
     const boardRerf = useRef<HTMLDivElement> (null)
     const mouseIsOver = React.useRef(false)
 
@@ -53,6 +54,7 @@ export const Board = (props : BoardProps) => {
 
         if (checkScrolledToBottom ()) {
             setPagedMessages ([])
+            allPagesReceived.current = false
         }
     }
 
@@ -60,7 +62,7 @@ export const Board = (props : BoardProps) => {
 
     const handleWheel = (e : React.WheelEvent<HTMLDivElement>) => {
 
-        if (handleWheelIsBusy.current) {
+        if (handleWheelIsBusy.current || allPagesReceived.current) {
             return
         }
         
@@ -89,9 +91,14 @@ export const Board = (props : BoardProps) => {
             retryPromise (logger, () => SERVER.listMessagesBefore (afterIndex))
                 .then (response => {
                     if (response.type === 'success') {
-                        setPagedMessages (list => [...response.messages,...list])
-                        boardRerf.current!.scrollTop = 1
+                        if (response.messages.length !== 0) {
+                            setPagedMessages (list => [...response.messages,...list])                            
+                        }
+                        else {
+                            allPagesReceived.current = true
+                        }
 
+                        boardRerf.current!.scrollTop = 1
                     }
                     else {
                         logger.error ("Invalid pading response", {response})
