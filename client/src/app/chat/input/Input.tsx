@@ -1,5 +1,4 @@
 import React, { useRef } from "react";
-import { MessageModel } from "../../../generated/shared";
 
 import { Logger } from "../../../util/Logger";
 import { nullToNothing } from "../../../util/nullToNothing";

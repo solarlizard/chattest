@@ -27,6 +27,8 @@ type Action = {
     payload : React.UIEvent<HTMLDivElement>
 }
 
+const MAX_VISIBLE_MESSAGES_LENGTH = 50
+
 export const Chat = () => {
 
     const [stateMessages, setStateMessages] = useState<MessageModel []> ([])
@@ -122,11 +124,19 @@ export const Chat = () => {
                 list[index] = message
                 return list
             }
-            else {
-                if (messagesListDiv.current!.scrollHeight - messagesListDiv.current!.scrollTop === messagesListDiv.current!.clientHeight) {
-                    afterMessagesChangedAction.current = 'movetoBottom'
-                }
+            else if (messagesListDiv.current!.scrollHeight - messagesListDiv.current!.scrollTop === messagesListDiv.current!.clientHeight) {
+                afterMessagesChangedAction.current = 'movetoBottom'
 
+                const result = [...list, message]
+
+                if (result.length > 50) {
+                    return result.slice ( (result.length - MAX_VISIBLE_MESSAGES_LENGTH))
+                }
+                else {
+                    return result
+                }
+            }
+            else {
                 return [...list, message]
             }
         })
@@ -136,17 +146,16 @@ export const Chat = () => {
 
     const handleScrollAction = () => {
 
-        const MAX_LENGTH = 50
 
         if (messagesListDiv.current!.scrollTop !== 0) {
             pagedToTop.current = false
         }
 
         if (messagesListDiv.current!.scrollHeight - messagesListDiv.current!.scrollTop - messagesListDiv.current!.clientHeight === 0) {
-            if (messages.current.length > MAX_LENGTH) {
+            if (messages.current.length > MAX_VISIBLE_MESSAGES_LENGTH) {
 
                 afterMessagesChangedAction.current = 'movetoBottom'
-                setMessages (stateMessages => stateMessages.slice (stateMessages.length - MAX_LENGTH))
+                setMessages (stateMessages => stateMessages.slice (stateMessages.length - MAX_VISIBLE_MESSAGES_LENGTH))
                 
                 return observeActionFinished ()
             }
@@ -210,7 +219,7 @@ export const Chat = () => {
 
         actionFinishedSubject.current.next ()
         
-    }, [stateMessages])
+    }, [stateMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
     
     useEffect (() => {
@@ -230,7 +239,7 @@ export const Chat = () => {
         return () => {
             subscription.unsubscribe ()
         }
-    }, [])
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
     
     useEffect (() => {
 
@@ -239,7 +248,7 @@ export const Chat = () => {
         return () => {
             socket.close ()
         }
-    }, [])    
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
     
     return (
         <div className={styles.Chat} style={{overflow: "hidden"}}>
