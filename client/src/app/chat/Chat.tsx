@@ -37,30 +37,30 @@ export const Chat = () => {
         }
     )
 
-    useEffect(() => {
-
-        const handleSocketResponse = (response : ListenMessagesResponse) => {
-            if (response.type === 'success') {
-                
-                if (response.result.type === 'list') {
-                    setMessages (shrinkList(response.result.messages))
-                }
-                else {
-                    handleMessage (response.result.message)
-                }
+    const handleSocketResponse = (response : ListenMessagesResponse) => {
+        if (response.type === 'success') {
+            
+            if (response.result.type === 'list') {
+                setMessages (shrinkList(response.result.messages))
             }
             else {
-                logger.current.error ("Invalid response", {response})
+                handleMessage (response.result.message)
             }
-    
         }
-                
+        else {
+            logger.current.error ("Invalid response", {response})
+        }
+
+    }
+
+    useEffect(() => {
+
         const socket = SERVER.listenMessages (handleSocketResponse)
 
         return () => {
             socket.close ()
         }
-    }, []);
+    }, [])
     
     console.log ("RERENDER")
 
