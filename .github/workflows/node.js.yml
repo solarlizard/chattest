@@ -16,6 +16,9 @@ jobs:
           with:
               persist-credentials: false
               fetch-depth: 0
-                
+        - uses: actions/setup-node@v3
+          with:
+            node-version: 16.14.0
+
         - run: cd client && yarn
         - run: cd server && yarn && ./test.sh
