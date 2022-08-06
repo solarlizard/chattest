@@ -6,7 +6,7 @@
 
 - ````./start.sh```` or ````docker-compose up --build````
 
-goto http://localhost:8080 after everything is started
+- goto http://localhost:8080 after everything is started
 
 ### No need to do yarn or npm install
 
@@ -18,7 +18,7 @@ goto http://localhost:8080 after everything is started
 
 # Out of scope
 
-- I redesigned code from lerna way to two projects, like they are in different repositories. I beleive it is not a good idea to do two jobs in one time (coding server and client, checking server using clinet). I prefer to build server and cover it with tests to be sure that I can build client without thinkig of server problems.
+- I redesigned code structure to have two separated projects, like they are in different repositories. I beleive it is not a good idea to do two jobs in one time (coding server and client, checking server using clinet). I prefer to build server and cover it with tests to be sure that I can build client without thinkig of server problems.
 - I removed schema validation, because I suppose that both client and server should use api models and validation generated from some OpenAPI or Protobuf schemas. Usually I am using my own code generators, and they generates not only models, but controller interfaces, clients and valiadators. 
 - Code in "generated" folders - are the code, that shuld be generated as I mentioned above
 
@@ -58,5 +58,7 @@ Lines        : 100% ( 235/235 )
 
 # Client
 - As I mentioned during interview - I am not a front-end developer, so I am sure that I missed some modern tehcnics.
-- In real life building eternity scrolling for messages list is complicated task, so I provided only one part of it - loading pages of messages with scrolling to top
-- In
+- In real life eternity scrolling for messages list is complicated task, so I provided only one part of it - loading pages of messages with scrolling to top
+
+# TODO
+- Client tests with mocking server
