@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import styles from "./Chat.module.css"
 
@@ -8,8 +8,6 @@ import { MessageModel } from "../../generated/shared";
 import { ListenMessagesResponse } from "../../generated/ListenMessagesResponse";
 import { Logger } from "../../util/Logger";
 import { SERVER } from "./Server";
-
-
 
 export const Chat = () => {
 
@@ -38,24 +36,25 @@ export const Chat = () => {
             }
         }
     )
-    
-    const handleSocketResponse = (response : ListenMessagesResponse) => {
-        if (response.type === 'success') {
-            
-            if (response.result.type === 'list') {
-                setMessages (shrinkList(response.result.messages))
+
+    useEffect(() => {
+
+        const handleSocketResponse = (response : ListenMessagesResponse) => {
+            if (response.type === 'success') {
+                
+                if (response.result.type === 'list') {
+                    setMessages (shrinkList(response.result.messages))
+                }
+                else {
+                    handleMessage (response.result.message)
+                }
             }
             else {
-                handleMessage (response.result.message)
+                logger.current.error ("Invalid response", {response})
             }
+    
         }
-        else {
-            logger.current.error ("Invalid response", {response})
-        }
-
-    }
-
-    React.useEffect(() => {
+                
         const socket = SERVER.listenMessages (handleSocketResponse)
 
         return () => {
