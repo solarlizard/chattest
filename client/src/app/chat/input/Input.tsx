@@ -11,11 +11,7 @@ import { faker } from '@faker-js/faker';
 
 import styles from "./Input.module.css"
 
-export interface InputProps {
-    onMessage : (message : MessageModel) => void
-}
-
-export const Input = (props : InputProps) => {
+export const Input = () => {
 
     const logger = useRef (new Logger ("Input"))
 
@@ -56,10 +52,7 @@ export const Input = (props : InputProps) => {
 
             retryPromise (logger.current, () => SERVER.postMessage (model))
                 .then (response => {
-                    if (response.type === 'success') {
-                        props.onMessage (response.message)
-                    }
-                    else {
+                    if (response.type !== 'success') {
                         throw new Error ("Invalid response")
                     }
                 })
@@ -107,7 +100,7 @@ export const Input = (props : InputProps) => {
     }
 
     const handleSeed = async () => {
-        for (let q = 0; q < 100; q++) {
+        for (let q = 0; q < 200; q++) {
             await SERVER.postMessage ({
                 author : faker.name.firstName () + " " + faker.name.lastName (),
                 id : v4 ().toString (),
