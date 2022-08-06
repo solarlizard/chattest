@@ -1,0 +1,1 @@
+### In real project this folder and all its content should be generated from OPENAPI spec

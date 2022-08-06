@@ -1,0 +1,8 @@
+{
+    "exit": true,
+    "recursive": true,
+    "require": ["test/mocha.js"],
+    "timeout": 10000,
+    "reporter": ["list"],
+    "bail": true
+}

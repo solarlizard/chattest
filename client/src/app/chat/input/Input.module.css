@@ -1,0 +1,8 @@
+.Input {
+    padding: 10px;
+    background-color: #eeeeee;
+}
+
+.Input > form > input:nth-child(n+2) {
+    margin-top: 10px;
+}

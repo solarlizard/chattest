@@ -1,0 +1,4 @@
+.Board {
+    border-bottom: 1px solid #cccccc;
+    overflow: scroll;
+}

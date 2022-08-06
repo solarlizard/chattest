@@ -1,0 +1,19 @@
+version: '3'
+services:
+    mongo:
+        image: mongo:5.0.10
+        ports:
+          - 27017:27017
+        environment:
+          - MONGO_INITDB_ROOT_USERNAME=login
+          - MONGO_INITDB_ROOT_PASSWORD=password
+    server:
+        build: ./server
+        environment:
+          - dbUrl=mongodb://login:password@mongo:27017
+          - dbName=chat
+          - httpPort=8080
+        depends_on:
+          - mongo
+        ports:
+          - 8090:8080
