@@ -2,10 +2,9 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import {App} from "./App";
 
-test("renders learn react link", () => {
+test("App", () => {
+  window.HTMLElement.prototype.scrollIntoView = function() {};
+  (window as any).setImmediate = () => {}
+
   render(<App />);
-  const headerElement = screen.getByText(
-    /Welcome to the Introvoke Frontend Interview Project!/i
-  );
-  expect(headerElement).toBeInTheDocument();
 });
