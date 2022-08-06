@@ -17,5 +17,5 @@ jobs:
               persist-credentials: false
               fetch-depth: 0
                 
-        - run: cd server && yarn && ./test.sh
         - run: cd client && yarn
+        - run: cd server && yarn && ./test.sh
