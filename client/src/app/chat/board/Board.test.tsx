@@ -6,7 +6,7 @@ test("Board", () => {
   window.HTMLElement.prototype.scrollIntoView = function() {};
   (window as any).setImmediate = () => {}
 
-  render(<Board messages={[{
+  render(<Board streamedMessages={[{
     id : 'id1',
     index : 1,
     ver : 0,

@@ -64,7 +64,7 @@ export const Chat = () => {
     
     return (
         <div className={styles.Chat} style={{overflow: "hidden"}}>
-            <Board messages={messages}/>
+            <Board streamedMessages={messages}/>
             <Input onMessage={handleMessage}/>
         </div>
     )
