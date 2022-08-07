@@ -16,12 +16,14 @@ export class ListMessagesController implements ListMessagesServer {
     private readonly createQueryServiceModel = (request : ListMessagesExpressRequest) : ListMessagesQueryServiceModel => {
         if (request.query.type === 'before') {
             return {
-                beforeIndex : parseInt (request.query.index)
+                beforeIndex : parseInt (request.query.index),
+                limit : 50
             }
         }
         else /* istanbul ignore else */ if (request.query.type === 'after') {
             return {
-                afterIndex : parseInt (request.query.index)
+                afterIndex : parseInt (request.query.index),
+                limit : 50
             }
         }
         else {

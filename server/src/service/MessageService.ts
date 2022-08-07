@@ -38,7 +38,7 @@ export class MessageService {
     public readonly listPage = (query : ListMessagesQueryServiceModel) => MESSAGE_DAO.list ({
         beforeIndex : query.beforeIndex,
         afterIndex : query.afterIndex,
-        limit : 50
+        limit : query.limit
     })
         .then (list => list.map (this.map))
         .then (list => {

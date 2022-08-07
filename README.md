@@ -14,9 +14,10 @@
 
 # Functions
 
-- Press "Seed" button to generate 100 messages
+- Press "Seed" button to generate 200 messages
 - Scroll to top to load next page of messages
 - Remove cursor from chat board to return to last messages
+- Infinite scroll with pagination for 100 messages per page
 
 # Out of scope
 
@@ -60,7 +61,6 @@ Lines        : 100% ( 235/235 )
 
 # Client
 - As I mentioned during interview - I am not a front-end developer, so I am sure that I missed some modern tehcnics.
-- In real applications infinite scroll for messages list is complicated task, so I provided only one part of it - loading pages of messages with scrolling to top
 - Client tests checks render of initial received messages page from socket:
 ````
 PASS  src/app/chat/Chat.test.tsx (5.024 s)
@@ -71,3 +71,6 @@ Tests:       2 passed, 2 total
 Snapshots:   0 total
 Time:        6.595 s
 ````
+
+# TODO
+- Need to better code some maths and corner cases on client
