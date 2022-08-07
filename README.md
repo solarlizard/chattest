@@ -1,3 +1,5 @@
+[![build](https://github.com/solarlizard/chattest/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/solarlizard/chattest/actions/workflows/node.js.yml)
+
 # Prerequirements
 - docker
 - docker-compose
