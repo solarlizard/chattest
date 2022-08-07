@@ -55,6 +55,10 @@ export const Chat = () => {
         payload : event
     })
 
+    const hanldeMouseLeave = () => {
+        messagesListDiv.current!.scrollTop = messagesListDiv.current!.scrollHeight - messagesListDiv.current!.clientHeight
+    }
+
     const handleSocketResponse = (response : ListenMessagesResponse) => {
         if (response.type === 'success') {
             
@@ -252,7 +256,7 @@ export const Chat = () => {
     
     return (
         <div className={styles.Chat} style={{overflow: "hidden"}}>
-            <div style={{overflow : "scroll"}} ref={messagesListDiv} onWheelCapture={handleWheel} onScrollCapture={handleScroll}>
+            <div style={{overflow : "scroll"}} ref={messagesListDiv} onWheelCapture={handleWheel} onScrollCapture={handleScroll} onMouseLeave={hanldeMouseLeave}>
                 <div ref={messagesListViewPortDiv}>
                     {stateMessages.map (item => <Message key={item.id} message={item}/>)}
                 </div>

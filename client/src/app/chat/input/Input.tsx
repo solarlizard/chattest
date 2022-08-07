@@ -121,7 +121,7 @@ export const Input = () => {
                             placeholder="Name" 
                             value={nullToNothing (name)} 
                             onChange={handleNameChanged}/>
-                    <input  disabled={busy} className="btn btn-outline-secondary btn-primary" type={"button"} value="Seed" onClick={handleSeed}/>
+                    <input  disabled={busy} className="btn btn-outline-secondary" type={"button"} value="Seed" onClick={handleSeed}/>
                 </div>
                 <div className="input-group mb-3">
                     <input  ref={contentInput}
