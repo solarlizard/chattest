@@ -22,10 +22,12 @@ export const attachToExpress = (router : express.Router, httpServer : http.Serve
     router.get("/api/messages/", server.listMessages)
 
     new Server(httpServer, {
-        path : '/api/messages/connect'        
+        path : "/api/messages/connect"
     })
-    .of('/messages')
-    .on('connection', server.listenMessages);
+    .on('connection', socket => {
+        console.log ("=======")
+        server.listenMessages (socket)
+    });
 
     
 }

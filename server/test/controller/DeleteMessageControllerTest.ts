@@ -13,8 +13,6 @@ import { MESSAGE_DAO } from '../../src/dao/message/MessageDao';
         // test
         const response = await this.axios.delete<any, AxiosResponse<DeleteMessageResponse>> (`http://127.0.0.1:8080/api/messages/fake`)
 
-        console.log (response.status)
-
         // assert
         assert.equal (response.data.type, 'messageNotFound')
 
