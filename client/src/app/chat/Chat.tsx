@@ -9,8 +9,6 @@ import { Message } from "./message/Message";
 import { ChatLoop } from "./ChatLoop";
 import { ChatConnection } from "./ChatConnection";
 
-export const MAX_VISIBLE_MESSAGES_LENGTH = 50
-
 export const Chat = () => {
 
     const [stateMessages, setStateMessages] = useState<MessageModel []> ([])
@@ -33,7 +31,7 @@ export const Chat = () => {
     })
 
     const hanldeMouseLeave = () => {
-        messagesListDiv.current!.scrollTop = messagesListDiv.current!.scrollHeight - messagesListDiv.current!.clientHeight
+        //messagesListDiv.current!.scrollTop = messagesListDiv.current!.scrollHeight - messagesListDiv.current!.clientHeight
     }
 
     useEffect (() => {

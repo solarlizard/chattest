@@ -15,7 +15,9 @@ export class ListenMessagesController implements ListenMessagesServer {
     )
 
     private readonly listPage = () => rx.from (
-            MESSAGE_SERVICE.listPage ({})
+            MESSAGE_SERVICE.listPage ({
+                limit : 100
+            })
         .then (this.createPageSuccessResponseModel)
     )
 

@@ -6,17 +6,19 @@ import { Logger } from "../../util/Logger";
 import { SERVER } from "./Server";
 import { retryPromise } from "../../util/retryPromise";
 import { ChatLoopAction } from "./ChatLoopAction";
-import { MAX_VISIBLE_MESSAGES_LENGTH } from "./Chat";
 
+export const MAX_VISIBLE_MESSAGES_LENGTH = 100
 
 export class ChatLoop {
 
     private readonly logger = new Logger(ChatLoop.name);
 
-    private messages: MessageModel[] = [];
+    private messagesToDisplay: MessageModel[] = [];
+    private lastReceivedMessage : MessageModel | null = null
 
     private subscription?: rx.Subscription;
-    private pagedToTop = false;
+    private isPagedToTop = false;
+    private isPagedToBottom = false;
 
     private readonly actionSubject = new rx.Subject<ChatLoopAction>();
     private readonly actionFinishedSubject = new rx.Subject<void>();
@@ -57,9 +59,9 @@ export class ChatLoop {
 
     private readonly setMessages = (setter : (state : MessageModel []) => MessageModel []) => this.renderMessages (state => {
 
-        this.messages = setter (state)
+        this.messagesToDisplay = setter (state)
 
-        return this.messages;
+        return this.messagesToDisplay;
     })
 
     private readonly observeActionFinished = () => this.actionFinishedSubject
@@ -87,51 +89,98 @@ export class ChatLoop {
     };
 
     private readonly handleMessageListAction = (list: MessageModel[]) => {
-        this.actionFinishedAction.current = 'movetoBottom';
-        this.setMessages(() => list);
 
+        if (list.length === 0) {
+            this.lastReceivedMessage = null
+        }
+        else {
+            this.lastReceivedMessage = list[list.length - 1]
+        }
+
+        this.actionFinishedAction.current = 'movetoBottom';
+
+        this.setMessages(() => list);
+            
         return this.observeActionFinished();
     };
 
+    private isScrolledToBottom = () => this.messagesListDiv.current!.scrollHeight - this.messagesListDiv.current!.scrollTop === this.messagesListDiv.current!.clientHeight
+
     private readonly handleMessageAction = (message: MessageModel) => {
 
-        this.setMessages(list => {
-            const index = list.findIndex(item => item.id === message.id);
+        const oldLastReceivedMessage : MessageModel | null = this.lastReceivedMessage
 
-            if (index >= 0) {
-                list[index] = message;
-                return list;
+        if (this.lastReceivedMessage) {
+            if (this.lastReceivedMessage.index <= message.index) {
+                this.lastReceivedMessage = message
             }
-            else if (this.messagesListDiv.current!.scrollHeight - this.messagesListDiv.current!.scrollTop === this.messagesListDiv.current!.clientHeight) {
-                this.actionFinishedAction.current = 'movetoBottom';
+        }
+        else {
+            this.lastReceivedMessage = message
+        }
 
-                const result = [...list, message];
+        if (this.isScrolledToBottom ()) {
 
-                if (result.length > 50) {
-                    return result.slice((result.length - MAX_VISIBLE_MESSAGES_LENGTH));
+            const canSetMessage = () => {
+                if (this.messagesToDisplay.length === 0) {
+                    return true
                 }
-                else {
-                    return result;
+                else if (oldLastReceivedMessage) {
+                    if (this.messagesToDisplay[this.messagesToDisplay.length - 1].id === oldLastReceivedMessage.id) {
+                
+                        return true
+                    }
                 }
+    
+                return false
             }
-            else {
-                return [...list, message];
-            }
-        });
 
-        return this.observeActionFinished();
+            if (canSetMessage ()) {
+                this.setMessages(list => {
+                    const index = list.findIndex(item => item.id === message.id);
+        
+                    if (index >= 0) {
+                        list[index] = message;
+                        return list;
+                    }
+                    else {
+                        this.actionFinishedAction.current = 'movetoBottom';
+        
+                        const result = [...list, message];
+        
+                        if (result.length > MAX_VISIBLE_MESSAGES_LENGTH) {
+                            return result.slice((result.length - MAX_VISIBLE_MESSAGES_LENGTH));
+                        }
+                        else {
+                            return result;
+                        }
+                    }
+                });
+                
+                return this.observeActionFinished();
+            }
+
+            return rx.EMPTY
+        }
+
+        return rx.EMPTY
+
+
     };
 
 
     private readonly handleScrollAction = () => {
 
-
         if (this.messagesListDiv.current!.scrollTop !== 0) {
-            this.pagedToTop = false;
+            this.isPagedToTop = false;
+        }
+
+        if (!this.isScrolledToBottom ()) {
+            this.isPagedToBottom = false;
         }
 
         if (this.messagesListDiv.current!.scrollHeight - this.messagesListDiv.current!.scrollTop - this.messagesListDiv.current!.clientHeight === 0) {
-            if (this.messages.length > MAX_VISIBLE_MESSAGES_LENGTH) {
+            if (this.messagesToDisplay.length > MAX_VISIBLE_MESSAGES_LENGTH) {
 
                 this.actionFinishedAction.current = 'movetoBottom';
                 this.setMessages(stateMessages => stateMessages.slice(stateMessages.length - MAX_VISIBLE_MESSAGES_LENGTH));
@@ -146,28 +195,37 @@ export class ChatLoop {
 
     private readonly handleWheelAction = (event: React.WheelEvent) => {
 
-        if (this.messages.length === 0) {
+        if (this.messagesToDisplay.length === 0) {
             return rx.EMPTY;
         }
 
-        if (this.messagesListDiv.current?.scrollTop !== 0) {
-            return rx.EMPTY;
+        if (this.messagesListDiv.current?.scrollTop === 0) {
+            return this.handlePageUp (event)
         }
+        else if (this.isScrolledToBottom ()) {
+            return this.handlePageDown (event)
+        }
+
+        return rx.EMPTY
+
+    };
+
+    private readonly handlePageUp = (event: React.WheelEvent) => {
 
         if (event.deltaY >= 0) {
             return rx.EMPTY;
         }
 
-        if (this.pagedToTop) {
+        if (this.isPagedToTop) {
             return rx.EMPTY;
         }
 
-        retryPromise(this.logger, () => SERVER.listMessagesBefore(this.messages[0].index))
+        retryPromise(this.logger, () => SERVER.listMessagesBefore(this.messagesToDisplay[0].index))
             .then(response => {
                 if (response.type === 'success') {
 
                     if (response.messages.length === 0) {
-                        this.pagedToTop = true;
+                        this.isPagedToTop = true;
                         this.actionFinishedSubject.next();
                         return;
                     }
@@ -181,7 +239,17 @@ export class ChatLoop {
                         this.actionFinishedAction.current = undefined;
                     }
 
-                    this.setMessages(stateMessages => [...response.messages, ...stateMessages]);
+                    
+                    this.setMessages(stateMessages => {
+                        const result = [...response.messages, ...stateMessages]
+
+                        if (result.length > MAX_VISIBLE_MESSAGES_LENGTH) {
+                            return result.slice (0, MAX_VISIBLE_MESSAGES_LENGTH)
+                        }
+                        else {
+                            return result
+                        }
+                    });
 
                     if (!needToScrollToBottom) {
                         this.messagesListDiv.current!.scrollTop = 1;
@@ -190,6 +258,50 @@ export class ChatLoop {
             });
 
         return this.observeActionFinished();
-    };
+    }
+    
+    private readonly handlePageDown = (event: React.WheelEvent) => {
+        if (event.deltaY <= 0) {
+            return rx.EMPTY;
+        }
+
+        if (this.lastReceivedMessage === null) {
+            return rx.EMPTY;
+        }
+        
+        if (this.messagesToDisplay[this.messagesToDisplay.length - 1].id === this.lastReceivedMessage.id) {
+            return rx.EMPTY;
+        }
+        
+        if (this.isPagedToBottom) {
+            return rx.EMPTY;
+        }
+
+        retryPromise(this.logger, () => SERVER.listMessagesAfter(this.messagesToDisplay[this.messagesToDisplay.length - 1].index))
+            .then(response => {
+                if (response.type === 'success') {
+
+                    if (response.messages.length === 0) {
+                        this.isPagedToBottom = true;
+                        this.actionFinishedSubject.next();
+                        return;
+                    }
+
+
+                    this.setMessages(stateMessages => {
+                        const result = [...stateMessages, ...response.messages]
+
+                        if (result.length > MAX_VISIBLE_MESSAGES_LENGTH) {
+                            return result.slice (result.length - MAX_VISIBLE_MESSAGES_LENGTH)
+                        }
+                        else {
+                            return result
+                        }
+                    });
+                }
+            });
+
+        return this.observeActionFinished();
+    }
 
 }

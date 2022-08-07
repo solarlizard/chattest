@@ -49,9 +49,9 @@ import { MESSAGE_DAO } from '../../src/dao/message/MessageDao';
         
         // assert1
         if (response1.type === 'success' && response1.result.type === 'list') {
-            assert.equal (response1.result.messages.length, 50)            
-            assert.equal (response1.result.messages[0].index, 250)
-            assert.equal (response1.result.messages[49].index, 299)
+            assert.equal (response1.result.messages.length, 100)
+            assert.equal (response1.result.messages[0].index, 200)
+            assert.equal (response1.result.messages[99].index, 299)
         }
         else {
             fail ()
