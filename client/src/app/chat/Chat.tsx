@@ -1,70 +1,62 @@
-import React, { useState, useEffect } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 
 import styles from "./Chat.module.css"
 
 import {Input} from "./input/Input"
 import { MessageModel } from "../../generated/shared";
-import { ListenMessagesResponse } from "../../generated/ListenMessagesResponse";
-import { Logger } from "../../util/Logger";
-import { SERVER } from "./Server";
+import { Message } from "./message/Message";
+import { ChatLoop } from "./ChatLoop";
+import { ChatConnection } from "./ChatConnection";
+
+export const MAX_VISIBLE_MESSAGES_LENGTH = 50
 
 export const Chat = () => {
 
-    const [messages, setMessages] = useState<MessageModel []> ([])
-
-    const logger = React.useRef (new Logger ("Chat"))
-
-    const shrinkList = (list : MessageModel []) => {
-        if (list.length > 20) {
-            return list.splice (list.length - 20)
-        }
-        else {
-            return list
-        }
-    }
+    const [stateMessages, setStateMessages] = useState<MessageModel []> ([])
     
-    const handleMessage = (message : MessageModel) => setMessages (list => {
-            const index = list.findIndex (item => item.id === message.id)
+    const messagesListDiv = useRef<HTMLDivElement> (null)
+    const messagesListViewPortDiv = useRef<HTMLDivElement> (null)
+    const afterMessagesChangedAction = useRef<'movetoBottom'> ()
+    
+    const loop = React.useRef (new ChatLoop (setStateMessages, afterMessagesChangedAction, messagesListDiv, messagesListViewPortDiv))
+    const connection = React.useRef (new ChatConnection (action => loop.current.dispatch (action)))
 
-            if (index >= 0) {
-                list[index] = message
-                return list
-            }
-            else {
-                return shrinkList([...list, message])
-            }
-        }
-    )
+    const handleWheel = (event : React.WheelEvent<HTMLDivElement>) => loop.current.dispatch ({
+        type : 'handleWheel',
+        payload : event
+    })
 
-    const handleSocketResponse = (response : ListenMessagesResponse) => {
-        if (response.type === 'success') {
-            
-            if (response.result.type === 'list') {
-                setMessages (shrinkList(response.result.messages))
-            }
-            else {
-                handleMessage (response.result.message)
-            }
-        }
-        else {
-            logger.current.error ("Invalid response", {response})
-        }
+    const handleScroll = (event : React.WheelEvent<HTMLDivElement>) => loop.current.dispatch ({
+        type : 'handleScroll',
+        payload : event
+    })
 
+    const hanldeMouseLeave = () => {
+        messagesListDiv.current!.scrollTop = messagesListDiv.current!.scrollHeight - messagesListDiv.current!.clientHeight
     }
 
-    useEffect(() => {
+    useEffect (() => {
+        loop.current.handleActionCompleted ()
 
-        const socket = SERVER.listenMessages (handleSocketResponse)
+    }, [stateMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
-        return () => {
-            socket.close ()
-        }
+    useEffect (() => {
+        return loop.current.start ()
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    
+    useEffect (() => {
+        return connection.current.start ()
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
     
     return (
         <div className={styles.Chat} style={{overflow: "hidden"}}>
-            <Board streamedMessages={messages}/>
-            <Input onMessage={handleMessage}/>
+            <div style={{overflow : "scroll"}} ref={messagesListDiv} onWheelCapture={handleWheel} onScrollCapture={handleScroll} onMouseLeave={hanldeMouseLeave}>
+                <div ref={messagesListViewPortDiv}>
+                    {stateMessages.map (item => <Message key={item.id} message={item}/>)}
+                </div>
+            </div>
+            <Input/>
         </div>
     )
 };
