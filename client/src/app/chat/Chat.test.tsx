@@ -60,9 +60,7 @@ describe('Chat', () => {
       })
 
       // assert
-      await waitFor (() => screen.findByText ("testMessageContent1"), {
-        timeout : 5000
-      })
+      await waitFor (() => screen.findByText ("testMessageContent1"))
 
     });
 
