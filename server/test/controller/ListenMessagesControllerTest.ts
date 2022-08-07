@@ -40,7 +40,7 @@ import { MESSAGE_DAO } from '../../src/dao/message/MessageDao';
     
         this.socket = new Manager("ws://127.0.0.1:8080", {
             path : "/api/messages/connect"
-        }).socket ("/messages")
+        }).socket ("/")
 
         // test1
         const response1 = await rx.firstValueFrom (

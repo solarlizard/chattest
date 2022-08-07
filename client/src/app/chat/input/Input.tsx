@@ -99,11 +99,11 @@ export const Input = () => {
     }
 
     const handleSeed = async () => {
-        for (let q = 0; q < 200; q++) {
+        for (let q = 0; q < 100; q++) {
             await SERVER.postMessage ({
                 author : faker.name.firstName () + " " + faker.name.lastName (),
                 id : v4 ().toString (),
-                content : Date.now () + faker.hacker.phrase()
+                content : faker.hacker.phrase()
             })
                 .catch ()
                 .then ()

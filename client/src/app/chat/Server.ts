@@ -1,10 +1,9 @@
-import { Manager } from "socket.io-client";
 import { DeleteMessageResponse } from "../../generated/DeleteMessageResponse";
 import { ListenMessagesResponse } from "../../generated/ListenMessagesResponse";
 import { ListMessagesResponse } from "../../generated/ListMessagesResponse";
 import { PostMessageResponse } from "../../generated/PostMessageResponse";
 import { Logger } from "../../util/Logger";
-
+import {io} from 'socket.io-client';
 
 export interface PostMessageApiModel {
     readonly id : string,
@@ -16,8 +15,10 @@ export class Server {
 
     private readonly logger = new Logger (Server.name);
 
-    public readonly listenMessages = (handler : (response : ListenMessagesResponse) => void) => new Manager("ws://", {path : "/api/messages/connect"})
-        .socket ("/messages")
+
+    public readonly listenMessages = (handler : (response : ListenMessagesResponse) => void) => io({
+        path : '/api/messages/connect',
+    })
         .on ('data', handler)
 
     public readonly deleteMessage = (model : PostMessageApiModel) => fetch (`/api/messages/${model.id}`, {
