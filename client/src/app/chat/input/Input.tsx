@@ -99,7 +99,7 @@ export const Input = () => {
     }
 
     const handleSeed = async () => {
-        for (let q = 0; q < 100; q++) {
+        for (let q = 0; q < 200; q++) {
             await SERVER.postMessage ({
                 author : faker.name.firstName () + " " + faker.name.lastName (),
                 id : v4 ().toString (),
