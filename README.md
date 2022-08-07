@@ -59,6 +59,3 @@ Lines        : 100% ( 235/235 )
 # Client
 - As I mentioned during interview - I am not a front-end developer, so I am sure that I missed some modern tehcnics.
 - In real applications infinite scroll for messages list is complicated task, so I provided only one part of it - loading pages of messages with scrolling to top
-
-# TODO
-- Client tests with mocking server
