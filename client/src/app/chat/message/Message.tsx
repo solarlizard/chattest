@@ -23,7 +23,7 @@ export const Message = (props : MessageProps) => {
         <div>Deleted</div>
     )
 
-    const renderActiveMessage = (index : number, state : MessageModel.ActiveStateModel) => (
+    const renderActiveMessage = (state : MessageModel.ActiveStateModel) => (
         <div>
             <div className={styles.Header}>
                 <div className={styles.AuthorNamBlock} style={{overflow: "hidden"}}>
@@ -31,13 +31,13 @@ export const Message = (props : MessageProps) => {
                 </div>
                 <div className={`${styles.Date}`}>{formatDate (state.created)}</div>
             </div>
-            <div>{index}</div>
+            <div>{state.content}</div>
         </div>
     )
 
     const renderMessage = () => {
         if (props.message.state.type === 'active') {
-            return renderActiveMessage (props.message.index, props.message.state)
+            return renderActiveMessage (props.message.state)
         }
         else {
             return renderDeletedMessage ()
