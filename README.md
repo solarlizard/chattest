@@ -59,3 +59,13 @@ Lines        : 100% ( 235/235 )
 # Client
 - As I mentioned during interview - I am not a front-end developer, so I am sure that I missed some modern tehcnics.
 - In real applications infinite scroll for messages list is complicated task, so I provided only one part of it - loading pages of messages with scrolling to top
+- Client tests checks render of initial received messages page from socket:
+````
+PASS  src/app/chat/Chat.test.tsx (5.024 s)
+PASS  src/app/App.test.tsx (5.023 s)
+
+Test Suites: 2 passed, 2 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        6.595 s
+````
