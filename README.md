@@ -15,8 +15,6 @@
 # Functions
 
 - Press "Seed" button to generate 200 messages
-- Scroll to top to load next page of messages
-- Remove cursor from chat board to return to last messages
 - Infinite scroll with pagination for 100 messages per page
 
 # Out of scope
