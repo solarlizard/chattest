@@ -1,7 +1,7 @@
 import React from "react";
-import { MessageModel } from "../../../generated/shared";
-import { formatDateDiff } from "../../../util/formatDateDiff";
-import { stringToHslColor } from "../../../util/stringToColor";
+import { MessageModel } from "../../../../generated/shared";
+import { formatDateDiff } from "../../../../util/formatDateDiff";
+import { stringToHslColor } from "../../../../util/stringToColor";
 
 import styles from "./Message.module.css"
 

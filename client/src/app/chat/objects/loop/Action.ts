@@ -1,6 +1,6 @@
-import { MessageModel } from "../../generated/shared";
+import { MessageModel } from "../../../../generated/shared";
 
-export type ChatLoopAction = {
+export type Action = {
     type: 'handleMessage';
     payload: MessageModel;
 } | {
