@@ -6,9 +6,10 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: chattest
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  client:
+  server:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -30,7 +31,7 @@ jobs:
       #  with:
       #    node-version: 16.14.0
       
-      #- run: cd client && yarn
+      #- run: cd server && yarn && ./test.sh
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -41,7 +42,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         with:
-          context: ./client
+          context: ./server
           push: true
-          tags: latest
-          labels: latest
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
