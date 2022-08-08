@@ -26,11 +26,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-       - name: Build
-       - uses: actions/setup-node@v3
+      - name: Build
+      - uses: actions/setup-node@v3
           with:
             node-version: 16.14.0
-       - run: cd server && yarn
+      
+      - run: cd server && yarn
 
       - name: Build and push Docker image
         uses: docker/build-push-action
