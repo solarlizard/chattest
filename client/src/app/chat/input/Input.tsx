@@ -9,6 +9,7 @@ import {v4} from "uuid"
 import { faker } from '@faker-js/faker';
 
 import styles from "./Input.module.css"
+import { PostMessageResponse } from "../../../generated/PostMessageResponse";
 
 export const Input = () => {
 
@@ -44,25 +45,28 @@ export const Input = () => {
 
         const model = formToModel ()
 
-        if (model) {
-
-            contentInput.current!.disabled = true
-            setBusy (true)
-
-            retryPromise (logger.current, () => SERVER.postMessage (model))
-                .then (response => {
-                    if (response.type !== 'success') {
-                        throw new Error ("Invalid response")
-                    }
-                })
-                .finally (() => {
-                    setBusy (false)
-                    contentInput.current!.disabled = false
-                    contentInput.current!.focus ()
-                })
+        if (!model) {
+            return
         }
 
+        contentInput.current!.disabled = true
+        setBusy (true)
+
+        retryPromise (logger.current, () => SERVER.postMessage (model))
+            .then (handlePostResponse)
+            .finally (() => {
+                setBusy (false)
+                contentInput.current!.disabled = false
+                contentInput.current!.focus ()
+            })
+
         return false
+    }
+
+    const handlePostResponse = (response : PostMessageResponse) => {
+        if (response.type === 'emptyContent') {
+            setContentIsInvalid (true)
+        }
     }
 
     const formToModel = () : PostMessageApiModel | null =>  {
@@ -75,16 +79,9 @@ export const Input = () => {
             return null
         }        
 
-        const preparedContent = trimToNull (content)
-        if (preparedContent == null) {
-            setContent (nullToNothing (preparedContent))
-            setContentIsInvalid (true)
-            return null
-        }
-
         return {
+            content : content,
             author : preparedName,
-            content : preparedContent,
             id : Date.now ().toString ()
         }
     }

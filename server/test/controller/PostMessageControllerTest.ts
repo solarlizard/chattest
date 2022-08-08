@@ -3,7 +3,6 @@ import { ContainerTestBase } from '../ContainerTestBase';
 import {assert} from "chai";
 import { AxiosResponse } from 'axios';
 import { suite, test, only} from 'mocha-typescript';
-import { DeleteMessageResponse } from '../../src/generated/DeleteMessageResponse';
 import { MESSAGE_DAO } from '../../src/dao/message/MessageDao';
 import { PostMessageRequest } from '../../src/generated/PostMessageRequest';
 import { PostMessageResponse } from '../../src/generated/PostMessageResponse';
@@ -12,6 +11,19 @@ import { fail } from 'assert';
 
 @suite export class PostMessageControllerTest extends ContainerTestBase {
 
+    @test async emptyContent () {
+
+
+        // test
+        const response = await this.axios.post<any, AxiosResponse<PostMessageResponse>, PostMessageRequest.Body> (`http://127.0.0.1:8080/api/messages/id`, {
+            author : 'author2',
+            content : ' '
+        })
+
+        // assert
+        assert.equal (response.data.type, 'emptyContent')
+
+    }
     @test async messageExists () {
 
         // prepare
@@ -31,7 +43,6 @@ import { fail } from 'assert';
             content : 'content2'
         })
 
-        // ass
         // assert
         if (response.data.type === 'success') {
             assert.equal (response.data.message.id, 'id')

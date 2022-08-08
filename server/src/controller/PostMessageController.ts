@@ -20,11 +20,22 @@ export class PostMessageController implements PostMessageServer {
     private readonly createLogicModel = (request : PostMessageExpressRequest) : CreateMessageLogicModel => ({
         id : request.params.id,
         author : request.body.author,
-        content : request.body.content,
+        content : this.validateContent (request),
     })
 
     private readonly createSuccessResponse = (message : MessageServiceModel) : PostMessageResponse => ({
         type : 'success',
         message : createMessageModel (message)
     })
+
+    private readonly validateContent = (request : PostMessageExpressRequest) => {
+        const result = request.body.content.trim ()
+
+        if (result.length === 0) {
+            throw new PostMessageResponse.EmptyContentException ()
+        }
+        else {
+            return result;
+        }
+    }
 }

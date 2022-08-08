@@ -1,4 +1,5 @@
 import * as express from "express"
+import { ResponseException } from "../generated/ResponseException";
 
 import { Logger } from "./Logger"
 
@@ -14,7 +15,7 @@ export class ExpressApiControllerAdapter<PARAMS, BODY, QUERY,R> {
         const log = this.createLogFromRequet (request);
 
         try {
-            const controllerResponse = await this.controller (request);
+            const controllerResponse = await this.executeController (request)
 
             log['response:body'] = controllerResponse
             
@@ -25,6 +26,22 @@ export class ExpressApiControllerAdapter<PARAMS, BODY, QUERY,R> {
         catch (error) {
             response.sendStatus (500)
             this.logger.error ("Error executing http request", log, error)
+        }
+    }
+
+    private readonly executeController = async (request : express.Request<PARAMS, R, BODY, QUERY>) => {
+        try {
+            const controllerResponse = await this.controller (request);
+
+            return controllerResponse
+        }
+        catch (error) {
+            if (error instanceof ResponseException) {
+                return error.response
+            }
+            else {
+                throw error
+            }
         }
     }
     
