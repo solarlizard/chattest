@@ -1,0 +1,42 @@
+name: build
+
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+
+jobs:
+  server:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.14.0
+      
+      - run: cd server && yarn && ./test.sh
+          
+  client:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.14.0
+      
+      - run: cd client && yarn && yarn test
