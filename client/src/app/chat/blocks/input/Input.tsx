@@ -82,7 +82,7 @@ export const Input = () => {
         return {
             content : content,
             author : preparedName,
-            id : Date.now ().toString ()
+            id : v4 ().toString ()
         }
     }
 

@@ -24,10 +24,7 @@ export const attachToExpress = (router : express.Router, httpServer : http.Serve
     new Server(httpServer, {
         path : "/api/messages/connect"
     })
-    .on('connection', socket => {
-        console.log ("=======")
-        server.listenMessages (socket)
-    });
+    .on('connection', server.listenMessages);
 
     
 }

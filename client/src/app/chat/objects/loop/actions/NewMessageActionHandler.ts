@@ -13,14 +13,14 @@ export class NewMessageActionHandler {
     }
 
     public readonly handleMessageAction = (message: MessageModel) => {
+        const oldLastReceivedMessage = this.setLastReceivedMessageIfItIsLast (message)
 
-        this.setLastReceivedMessageIfItIsLast (message)
-
-        if (this.loop.isScrolledToBottom ()) {
+        if (!this.loop.isScrolledToBottom ()) {            
             return rx.EMPTY
         }
         
-        if (!this.needToRender ()) {
+
+        if (!this.needToRender (oldLastReceivedMessage)) {
             return rx.EMPTY
         }
 
@@ -59,23 +59,22 @@ export class NewMessageActionHandler {
         }
     }
 
-    private readonly needToRender = () => {
-        const oldLastReceivedMessage : MessageModel | null = this.loop.getLastReceivedMessage ()
+    private readonly needToRender = (oldLastReceivedMessage : MessageModel | null) => {
+        
         const messagesToDisplay = this.loop.getMessagesToDisplay ();
 
         if (messagesToDisplay.length === 0) {
             return true
         }
         else if (oldLastReceivedMessage) {
-            if (messagesToDisplay[messagesToDisplay.length - 1].id === oldLastReceivedMessage.id) {
-        
+    
+            if (messagesToDisplay[messagesToDisplay.length - 1].id === oldLastReceivedMessage.id) {        
                 return true
             }
         }
 
         return false
     }
-
 
     private readonly setLastReceivedMessageIfItIsLast = (message : MessageModel) => {
 
@@ -89,6 +88,8 @@ export class NewMessageActionHandler {
         else {
             this.loop.setLastReceivedMessage (message)
         }
+
+        return lastReceivedMessage
     }
 
 }

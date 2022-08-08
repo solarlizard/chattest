@@ -15,11 +15,11 @@ export class PageUpWheelActionHandler {
 
     public readonly handlePageUp = (event: React.WheelEvent, messagesToDisplay : MessageModel []) => {
 
-        if (event.deltaY >= 0) {
+        if (this.isScrollingToTop (event)) {
             return EMPTY;
         }
 
-        if (this.loop.getPagedTo () === 'top') {
+        if (this.isAlreadyAtTop ()) {
             return EMPTY;
         }
 
@@ -28,6 +28,9 @@ export class PageUpWheelActionHandler {
 
         return this.loop.observeActionFinished();
     }
+
+    private isScrollingToTop = (event: React.WheelEvent) => event.deltaY >= 0
+    private readonly isAlreadyAtTop = () => this.loop.getPagedTo () === 'top'
     
     private readonly handleResponse = (response : ListMessagesResponse) => {
         if (response.type === 'success') {
