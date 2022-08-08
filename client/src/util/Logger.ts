@@ -47,18 +47,5 @@ export class Logger {
     public readonly warn = this.log ('WARN')
     public readonly info = this.log ('INFO')
     public readonly trace = this.log ('TRACE')
-
-    public readonly retryPromise = async <T> (promise : () => Promise<T>, message : string) => {
-        while (true) {
-            try {
-                const result = await promise ()
-
-                return result;
-            }
-            catch (error) {
-                this.error (message, {}, error)
-            }
-        }
-    }
 }
 

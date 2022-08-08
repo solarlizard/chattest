@@ -2,7 +2,6 @@ import { EMPTY } from "rxjs";
 import { ListMessagesResponse } from "../../../../../../generated/ListMessagesResponse";
 import { MessageModel } from "../../../../../../generated/shared";
 import { Logger } from "../../../../../../util/Logger";
-import { retryPromise } from "../../../../../../util/retryPromise";
 import { SERVER } from "../../../../Server";
 import { Loop, MAX_VISIBLE_MESSAGES_LENGTH } from "../../Loop";
 
