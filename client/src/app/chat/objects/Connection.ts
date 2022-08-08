@@ -1,14 +1,14 @@
-import { Logger } from "../../util/Logger";
-import { SERVER } from "./Server";
-import { ListenMessagesResponse } from "../../generated/ListenMessagesResponse";
-import { ChatLoopAction } from "./ChatLoopAction";
+import { Logger } from "../../../util/Logger";
+import { SERVER } from "../Server";
+import { ListenMessagesResponse } from "../../../generated/ListenMessagesResponse";
+import { Action } from "./loop/Action";
 
 
 export class ChatConnection {
 
     private readonly logger = new Logger(ChatConnection.name);
 
-    public constructor (private readonly dispatch : (action : ChatLoopAction) => void) {
+    public constructor (private readonly dispatch : (action : Action) => void) {
 
     }
 

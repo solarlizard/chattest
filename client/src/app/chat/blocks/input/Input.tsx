@@ -1,15 +1,15 @@
 import React, { useRef } from "react";
 
-import { Logger } from "../../../util/Logger";
-import { nullToNothing } from "../../../util/nullToNothing";
-import { retryPromise } from "../../../util/retryPromise";
-import { trimToNull } from "../../../util/trimToNull";
-import { PostMessageApiModel, SERVER } from "../Server";
+import { Logger } from "../../../../util/Logger";
+import { nullToNothing } from "../../../../util/nullToNothing";
+import { retryPromise } from "../../../../util/retryPromise";
+import { trimToNull } from "../../../../util/trimToNull";
+import { PostMessageApiModel, SERVER } from "../../Server";
 import {v4} from "uuid"
 import { faker } from '@faker-js/faker';
 
 import styles from "./Input.module.css"
-import { PostMessageResponse } from "../../../generated/PostMessageResponse";
+import { PostMessageResponse } from "../../../../generated/PostMessageResponse";
 
 export const Input = () => {
 
@@ -82,7 +82,7 @@ export const Input = () => {
         return {
             content : content,
             author : preparedName,
-            id : Date.now ().toString ()
+            id : v4 ().toString ()
         }
     }
 

@@ -3,11 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 
 import styles from "./Chat.module.css"
 
-import {Input} from "./input/Input"
+import {Input} from "./blocks/input/Input"
 import { MessageModel } from "../../generated/shared";
-import { Message } from "./message/Message";
-import { ChatLoop } from "./ChatLoop";
-import { ChatConnection } from "./ChatConnection";
+import { Message } from "./blocks/message/Message";
+import { Loop } from "./objects/loop/Loop";
+import { POST_RENDER_ACTION } from "./objects/loop/POST_RENDER_ACTION";
+import { ChatConnection } from "./objects/Connection";
 
 export const Chat = () => {
 
@@ -15,11 +16,11 @@ export const Chat = () => {
     
     const messagesListDiv = useRef<HTMLDivElement> (null)
     const messagesListViewPortDiv = useRef<HTMLDivElement> (null)
-    const afterMessagesChangedAction = useRef<'movetoBottom'> ()
+    const postRenderAction = useRef<POST_RENDER_ACTION> (null)
     
-    const loop = React.useRef (new ChatLoop (setStateMessages, afterMessagesChangedAction, messagesListDiv, messagesListViewPortDiv))
+    const loop = React.useRef (new Loop (setStateMessages, postRenderAction, messagesListDiv, messagesListViewPortDiv))
     const connection = React.useRef (new ChatConnection (action => loop.current.dispatch (action)))
-
+    
     const handleWheel = (event : React.WheelEvent<HTMLDivElement>) => loop.current.dispatch ({
         type : 'handleWheel',
         payload : event
@@ -30,18 +31,12 @@ export const Chat = () => {
         payload : event
     })
 
-    useEffect (() => {
-        loop.current.handleActionCompleted ()
 
-    }, [stateMessages]) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect (() => loop.current.handlePostRenderAction (), [stateMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    useEffect (() => {
-        return loop.current.start ()
-    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect (() => loop.current.start (), []) // eslint-disable-line react-hooks/exhaustive-deps
     
-    useEffect (() => {
-        return connection.current.start ()
-    }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect (() => connection.current.start (), []) // eslint-disable-line react-hooks/exhaustive-deps
     
     return (
         <div className={styles.Chat} style={{overflow: "hidden"}}>
