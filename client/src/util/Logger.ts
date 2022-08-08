@@ -1,6 +1,5 @@
 
 import * as rx from "rxjs"
-import * as ro from "rxjs/operators"
 
 type LOG_LEVEL = 'ERROR' | 'WARN' | 'INFO' | 'TRACE' | 'FATAL'
 

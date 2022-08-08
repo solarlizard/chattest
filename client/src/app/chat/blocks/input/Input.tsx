@@ -5,7 +5,6 @@ import React, { useEffect, useRef } from "react";
 
 import { Logger } from "../../../../util/Logger";
 import { nullToNothing } from "../../../../util/nullToNothing";
-import { retryPromise } from "../../../../util/retryPromise";
 import { trimToNull } from "../../../../util/trimToNull";
 import { PostMessageApiModel, SERVER } from "../../Server";
 import {v4} from "uuid"
