@@ -1,0 +1,40 @@
+name: build
+
+on:
+    push:
+        branches:
+          - '**'
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+
+    build_client:
+
+      runs-on: ubuntu-latest
+      
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+        
+        - uses: actions/setup-node@v3
+          with:
+            node-version: 16.14.0
+
+        - name: Log in to the Container registry
+          uses: docker/login-action
+          with:
+            registry: ${{ env.REGISTRY }}
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
+        - run: cd server && yarn
+
+        - name: Build and push Docker image
+          uses: docker/build-push-action
+          with:
+            context: ./server/
+            push: true
+            tags: latest
+            labels: latest
