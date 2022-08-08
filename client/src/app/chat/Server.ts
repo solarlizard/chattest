@@ -1,3 +1,6 @@
+import * as rx from "rxjs"
+import * as ro from "rxjs/operators"
+
 import { DeleteMessageResponse } from "../../generated/DeleteMessageResponse";
 import { ListenMessagesResponse } from "../../generated/ListenMessagesResponse";
 import { ListMessagesResponse } from "../../generated/ListMessagesResponse";
@@ -15,6 +18,13 @@ export class Server {
 
     private readonly logger = new Logger (Server.name);
 
+    public readonly executeWithRetry = <T> (executor : () => Promise<T>) => rx.of ({})
+        .pipe (
+            ro.concatMap (() => executor ())
+        )
+        .pipe (
+            ro.retry (this.logger.rx.retry ("Error executing request"))
+        )
 
     public readonly listenMessages = (handler : (response : ListenMessagesResponse) => void) => io({
         path : '/api/messages/connect',
@@ -29,7 +39,7 @@ export class Server {
     })
         .then (this.handleResponse<DeleteMessageResponse>)
         .catch (this.handleError)
-
+        
     public readonly postMessage = (model : PostMessageApiModel) => fetch (`/api/messages/${model.id}`, {
         method : 'post',
         headers : {

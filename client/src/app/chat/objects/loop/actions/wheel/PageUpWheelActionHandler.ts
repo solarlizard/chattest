@@ -2,7 +2,6 @@ import { EMPTY } from "rxjs";
 import { ListMessagesResponse } from "../../../../../../generated/ListMessagesResponse";
 import { MessageModel } from "../../../../../../generated/shared";
 import { Logger } from "../../../../../../util/Logger";
-import { retryPromise } from "../../../../../../util/retryPromise";
 import { SERVER } from "../../../../Server";
 import { Loop, MAX_VISIBLE_MESSAGES_LENGTH } from "../../Loop";
 
@@ -23,13 +22,21 @@ export class PageUpWheelActionHandler {
             return EMPTY;
         }
 
-        retryPromise(this.logger, () => SERVER.listMessagesBefore(messagesToDisplay[0].index))
-            .then(this.handleResponse);
+        this.requestPage (messagesToDisplay[0].index)
+        
 
         return this.loop.observeActionFinished();
     }
 
+    private readonly requestPage = (beforeIndex : number) => SERVER.listMessagesBefore (beforeIndex)
+        .then(this.handleResponse)
+        .catch (error => {
+            this.logger.error ("Error requesting mesasges", {}, error)
+            this.loop.notifyActionFinished (1000)
+        })
+
     private isScrollingToTop = (event: React.WheelEvent) => event.deltaY >= 0
+
     private readonly isAlreadyAtTop = () => this.loop.getPagedTo () === 'top'
     
     private readonly handleResponse = (response : ListMessagesResponse) => {

@@ -46,7 +46,16 @@ export class Loop {
     ) {
     }
 
-    public readonly notifyActionFinished = () => this.actionFinishedSubject.next ()
+    public readonly notifyActionFinished = (delay? : number) => {
+        if (delay) {
+            setTimeout(() => {
+                this.actionFinishedSubject.next () 
+            }, delay);
+        }
+        else {
+            this.actionFinishedSubject.next ()
+        }
+    }
 
     public readonly dispatch = (action: Action) => this.actionSubject.next(action);
 
@@ -54,11 +63,9 @@ export class Loop {
 
         this.subscription = this.actionSubject
             .pipe(
-                ro.concatMap(this.handleAction)
+                ro.concatMap (this.handleAction)
             )
-            .subscribe({
-                error: error => this.logger.error("Error in loop", {}, error)
-            });
+            .subscribe(this.logger.rx.subscribe ("Error in loop"));
 
         return () => {
             this.subscription?.unsubscribe();
