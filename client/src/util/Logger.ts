@@ -1,4 +1,8 @@
-type LOG_LEVEL = 'ERROR' | 'WARN' | 'INFO' | 'TRACE'
+
+import * as rx from "rxjs"
+import * as ro from "rxjs/operators"
+
+type LOG_LEVEL = 'ERROR' | 'WARN' | 'INFO' | 'TRACE' | 'FATAL'
 
 export class Logger {
 
@@ -13,6 +17,33 @@ export class Logger {
         }
     }
 
+    public readonly rx = {
+        retry : (message  : string, params : any  = {}) : rx.RetryConfig => ({
+            resetOnSuccess : true,
+            delay : error => {
+                this.error (message, params, error)
+
+                return rx.timer (1000)
+            }
+        }),
+        subscribe: (message : string, {
+            params = {},
+        } : {
+            params ?: any,
+        } = {
+            params: {},
+        }) => {
+            return {
+                next: () => {},
+                complete: () => {},
+                error: (error : any) => {
+                    this.fatal (message, params, error)
+                },
+            }
+        },
+    }    
+
+    public readonly fatal = this.log ('FATAL')
     public readonly error = this.log ('ERROR')
     public readonly warn = this.log ('WARN')
     public readonly info = this.log ('INFO')

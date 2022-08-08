@@ -1,4 +1,7 @@
-import React, { useRef } from "react";
+import * as rx from "rxjs"
+import * as ro from "rxjs/operators"
+
+import React, { useEffect, useRef } from "react";
 
 import { Logger } from "../../../../util/Logger";
 import { nullToNothing } from "../../../../util/nullToNothing";
@@ -24,6 +27,8 @@ export const Input = () => {
     const [contentIsInvalid, setContentIsInvalid] = React.useState (false)
 
     const [busy, setBusy] = React.useState (false)
+
+    const unmountedSubject = useRef(new rx.Subject<void> ())
 
     const clearInvalids = () => {
         setNameIsInvalid (false)
@@ -52,21 +57,27 @@ export const Input = () => {
         contentInput.current!.disabled = true
         setBusy (true)
 
-        retryPromise (logger.current, () => SERVER.postMessage (model))
-            .then (handlePostResponse)
-            .finally (() => {
-                setBusy (false)
-                contentInput.current!.disabled = false
-                contentInput.current!.focus ()
-            })
-
+        doPost (model)
+        
         return false
     }
+
+    const doPost = (model : PostMessageApiModel) => SERVER.executeWithRetry (() => SERVER.postMessage (model))
+        .pipe (
+            ro.map (handlePostResponse),
+            ro.takeUntil (unmountedSubject.current)
+        )
+        .subscribe (logger.current.rx.subscribe ("Error positing message"))
 
     const handlePostResponse = (response : PostMessageResponse) => {
         if (response.type === 'emptyContent') {
             setContentIsInvalid (true)
         }
+        
+        setBusy (false)
+        contentInput.current!.disabled = false
+        contentInput.current!.focus ()
+
     }
 
     const formToModel = () : PostMessageApiModel | null =>  {
@@ -102,10 +113,16 @@ export const Input = () => {
                 id : v4 ().toString (),
                 content : faker.hacker.phrase()
             })
-                .catch ()
-                .then ()
-            }
+        }
     }
+
+    useEffect (() => {
+        const subject = unmountedSubject.current;
+
+        return () => {
+            subject.next ()
+        }
+    }, [])
 
     return (
         <div className={styles.Input}>

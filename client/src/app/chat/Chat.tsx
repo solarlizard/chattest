@@ -3,12 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 
 import styles from "./Chat.module.css"
 
-import {Input} from "./blocks/input/Input"
 import { MessageModel } from "../../generated/shared";
 import { Message } from "./blocks/message/Message";
-import { Loop } from "./objects/loop/Loop";
 import { POST_RENDER_ACTION } from "./objects/loop/POST_RENDER_ACTION";
 import { ChatConnection } from "./objects/Connection";
+import { Loop } from "./objects/loop/Loop";
+import { Input } from "./blocks/input/Input";
 
 export const Chat = () => {
 

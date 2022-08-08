@@ -2,7 +2,6 @@ import { EMPTY } from "rxjs";
 import { ListMessagesResponse } from "../../../../../../generated/ListMessagesResponse";
 import { MessageModel } from "../../../../../../generated/shared";
 import { Logger } from "../../../../../../util/Logger";
-import { retryPromise } from "../../../../../../util/retryPromise";
 import { SERVER } from "../../../../Server";
 import { Loop, MAX_VISIBLE_MESSAGES_LENGTH } from "../../Loop";
 
@@ -14,7 +13,7 @@ export class PageDownWheelActionHandler {
     }
 
     public readonly handlePageDown = (event: React.WheelEvent, messagesToDisplay : MessageModel []) => {
-        if (event.deltaY <= 0) {
+        if (this.isScrollingDown (event)) {
             return EMPTY;
         }
 
@@ -24,7 +23,7 @@ export class PageDownWheelActionHandler {
             return EMPTY;
         }
         
-        if (messagesToDisplay[messagesToDisplay.length - 1].id === lastReceivedMessage.id) {
+        if (this.isScrolledToLastReceivedMessage (lastReceivedMessage, messagesToDisplay)) {
             return EMPTY;
         }
         
@@ -32,13 +31,21 @@ export class PageDownWheelActionHandler {
             return EMPTY;
         }
 
-        const afterIndex = messagesToDisplay[messagesToDisplay.length - 1].index;
-
-        retryPromise(this.logger, () => SERVER.listMessagesAfter(afterIndex))
-            .then(this.handleResponse);
-
+        this.requestPage (messagesToDisplay[messagesToDisplay.length - 1].index)
+            
         return this.loop.observeActionFinished();
     }
+
+    private readonly isScrolledToLastReceivedMessage = (lastReceivedMessage : MessageModel, messagesToDisplay : MessageModel []) => messagesToDisplay[messagesToDisplay.length - 1].id === lastReceivedMessage.id
+
+    private readonly isScrollingDown = (event: React.WheelEvent) => event.deltaY <= 0
+
+    private readonly requestPage = (afterIndex : number) => SERVER.listMessagesAfter (afterIndex)
+        .then(this.handleResponse)
+        .catch (error => {
+            this.logger.error ("Error requesting mesasges", {}, error)
+            this.loop.notifyActionFinished (1000)
+        })
 
     private readonly handleResponse = (response : ListMessagesResponse) => {
 
