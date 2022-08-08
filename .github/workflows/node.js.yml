@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-
+  IMAGE_NAME: chattest
 jobs:
   client:
     runs-on: ubuntu-latest
@@ -25,10 +25,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.14.0
+      #- name: Setup node
+      #  uses: actions/setup-node@v3
+      #  with:
+      #    node-version: 16.14.0
       
       #- run: cd client && yarn
 
