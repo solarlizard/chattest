@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 16.14.0
       
-      - run: cd server && yarn
+      - run: cd server && yarn && test.sh
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -44,5 +44,4 @@ jobs:
         with:
           context: ./server
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: latest
