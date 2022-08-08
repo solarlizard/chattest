@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./stop.sh
+./build.sh
 
 set -e
 
