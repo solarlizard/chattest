@@ -44,5 +44,5 @@ jobs:
         with:
           context: ./server
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: ghcr.io/solarlizard/chattest-server:latest
           labels: ${{ steps.meta.outputs.labels }}
