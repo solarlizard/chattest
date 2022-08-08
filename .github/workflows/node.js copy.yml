@@ -1,40 +1,36 @@
 name: build
 
 on:
-    push:
-        branches:
-          - '**'
+  push:
+    branches: ['**']
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
-    build_client:
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      runs-on: ubuntu-latest
-      
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v3
-        
-        - uses: actions/setup-node@v3
-          with:
-            node-version: 16.14.0
+      - name: Log in to the Container registry
+        uses: docker/login-action
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
 
-        - name: Log in to the Container registry
-          uses: docker/login-action
-          with:
-            registry: ${{ env.REGISTRY }}
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
-
-        - run: cd server && yarn
-
-        - name: Build and push Docker image
-          uses: docker/build-push-action
-          with:
-            context: ./server/
-            push: true
-            tags: latest
-            labels: latest
+      - name: Build and push Docker image
+        uses: docker/build-push-action
+        with:
+          context: ./server
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
